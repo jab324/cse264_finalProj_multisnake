@@ -1,0 +1,14 @@
+{
+  "name": "multisnake",
+  "version": "1.0.0",
+  "description": "Multiplayer snake game, serving as final project for CSE264 SP'24",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Joseph Bereswill (CSB'24)",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

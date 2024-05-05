@@ -16,6 +16,27 @@ html {
   font-size: 1em;
   line-height: 1.4;
 }
+body { margin: 0 }
+
+#headbar{
+  width: 100vw;
+  height: 6.5vh;
+  text-align: center;
+  color: ivory;
+  font-family: 'Courier New';
+  font-weight: bolder;
+  font-size: 6vh;
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black;
+  background-color: lime;
+}
+#myDiv{
+  border: solid 1px lime;
+  border-radius: 0px 0px 10px 10px;
+  width: 100vw;
+  height: 93.5vh;
+  background-color: black;
+}
 
 /*
  * Remove text-shadow in selection highlight:
