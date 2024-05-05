@@ -16,26 +16,61 @@ html {
   font-size: 1em;
   line-height: 1.4;
 }
-body { margin: 0 }
+body { 
+  margin: 0;
+  background-color: black;
+ }
 
 #headbar{
   width: 100vw;
-  height: 6.5vh;
+  height: 50px;
   text-align: center;
   color: ivory;
   font-family: 'Courier New';
   font-weight: bolder;
-  font-size: 6vh;
+  font-size: 46px;
   -webkit-text-stroke-width: 1px;
   -webkit-text-stroke-color: black;
   background-color: lime;
 }
 #myDiv{
   border: solid 1px lime;
-  border-radius: 0px 0px 10px 10px;
-  width: 100vw;
-  height: 93.5vh;
-  background-color: black;
+  width: 1302px;
+  height: 604px;
+  background-color: ivory;
+}
+
+#login{
+  position: absolute;
+  left: 1008px;
+  top: 620px;
+}
+
+#myTable{
+  position: absolute;
+  border: 1px solid lime;
+  border-collapse: collapse;
+  left: 1001px;
+  top: 51px;
+  background-color: green;
+  font-size: 30px;
+}
+th{
+  border-top: 1px solid lime;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
+  width: 150px;
+  height: 50px;
+}
+td{
+  border: 1px solid black;
+  width: 150px;
+  height: 50px;
+}
+
+#myCanvas{
+  border: 2px solid lime;
 }
 
 /*

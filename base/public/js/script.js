@@ -6,7 +6,7 @@
 let blockSize = 20;//size of a cell in grid 
 //changed from 25 to 20
 let total_row = 30;//total row number
-let total_col = 30;//total column number
+let total_col = 50;//total column number
 let canvas;//assign in onload
 let context;//assign in onload
  
@@ -27,8 +27,8 @@ let gameOver = false;
 $(document).ready(function() {
     canvas = document.getElementById("myCanvas");
     context = canvas.getContext("2d");
-    canvas.height = total_row * blockSize;
-    canvas.width = total_col * blockSize;
+    canvas.height = total_row * blockSize;//30x20=600 pixels tall
+    canvas.width = total_col * blockSize;//canvas is 50x20=1000 pixels wide
     context = canvas.getContext("2d");
  
     placeFood();
@@ -43,8 +43,8 @@ $(document).ready(function() {
         }
      
         // Background of a Game
-        context.fillStyle = "green";
-        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = "black";
+        context.fillRect(0,0, canvas.width, canvas.height);
      
         // Set food color and position
         context.fillStyle = "yellow";
@@ -64,7 +64,7 @@ $(document).ready(function() {
             snakeBody[0] = [snakeX, snakeY];
         }
      
-        context.fillStyle = "white";
+        context.fillStyle = "green";
         snakeX += speedX * blockSize; //updating Snake position in X coordinate.
         snakeY += speedY * blockSize;  //updating Snake position in Y coordinate.
         context.fillRect(snakeX, snakeY, blockSize, blockSize);
@@ -124,5 +124,19 @@ $(document).ready(function() {
         //in y coordinates.
         foodY = Math.floor(Math.random() * total_row) * blockSize; 
     }
+
+    const login = document.getElementById('login');
+    const loginInput = document.getElementById('loginInput');
+    const loginButton = document.getElementById('loginButton');
+
+    loginButton.addEventListener('click', function() {
+        //value of text input
+        const inputValue = loginInput.value;
+        loginInput.value = '';
+        //send login string to server and in handler, receive and save id?
+        socket.emit("login", inputValue);
+        //$(`#login`).css("display", "none");
+       login.style.display = "none";
+    });
     //end onload
 });
