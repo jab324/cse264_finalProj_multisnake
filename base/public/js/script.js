@@ -138,5 +138,11 @@ $(document).ready(function() {
         //$(`#login`).css("display", "none");
        login.style.display = "none";
     });
+
+    socket.on('loginresponse', function(datavalue) {
+        //do something with datavalue.
+        id = datavalue.id;
+        console.log(id);
+    });
     //end onload
 });
