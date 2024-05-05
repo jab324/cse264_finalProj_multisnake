@@ -1,7 +1,7 @@
 //define global vars
 //adust and reference citation...
 ///https://www.geeksforgeeks.org/create-a-snake-game-using-html-css-and-javascript/
-
+let id = "";
 
 let blockSize = 20;//size of a cell in grid 
 //changed from 25 to 20
