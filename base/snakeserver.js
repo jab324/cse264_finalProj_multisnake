@@ -324,16 +324,9 @@ io.on("connection",
         console.log("opponent will power down!");
         socket.emit("playerPD", cause);
     })
-
-    // socket.on("imageswap", (obj) => {
-    //   const id = obj.id;
-    //   if (fruitSmashPlayers.getName(id) == "") {
-    //     socket.emit("debug", `ERROR: Invalid id (${id}) sent with swap message.`)
-    //   } else {
-    //     processSwap(socket, obj);
-    //   }
-    // })
-
+    if(snakePlayers.length === 2){
+        socket.emit("matchmade", true);
+    }
     updateStatus();
   }
 );
