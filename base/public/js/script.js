@@ -24,6 +24,8 @@ let foodY;
  
 let gameOver = false;
 
+const socket = io.connect('http://neptune.cse.lehigh.edu:4040');
+
 $(document).ready(function() {
     canvas = document.getElementById("myCanvas");
     context = canvas.getContext("2d");
@@ -51,6 +53,7 @@ $(document).ready(function() {
         context.fillRect(foodX, foodY, blockSize, blockSize);
      
         if (snakeX == foodX && snakeY == foodY) {
+            socket.emit("eatPellet", id);
             snakeBody.push([foodX, foodY]);
             placeFood();
         }
