@@ -320,17 +320,9 @@ io.on("connection",
         updateScore(id);
     })
 
-    socket.on("chatsend", (obj) => {
-      const id = obj.id;
-      const message = obj.message;
-      console.log(`processing chat request: userid= ${id} message= ${message}`);
-      const name = snakePlayers.getName(id);
-      if (name == "") {
-        socket.emit("debug", `ERROR: Invalid id (${id}) sent with chat message.`)
-      } else {
-        const post = name + ": " + message;
-        updateChat(post);
-      }
+    socket.on("powerdown", (cause) => {
+        console.log("opponent will power down!");
+        socket.emit("playerPD", cause);
     })
 
     // socket.on("imageswap", (obj) => {
