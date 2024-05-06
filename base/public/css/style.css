@@ -50,6 +50,7 @@ body {
   position: absolute;
   left: 1213px;
   top: 590px;
+  display: none;
 }
 
 #myTable{

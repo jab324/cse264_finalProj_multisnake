@@ -35,7 +35,7 @@ const socket = io.connect('http://neptune.cse.lehigh.edu:4040');
 $(document).ready(function() {
     function loadgame(){
         placeFood();
-        document.addEventListener("keyup", changeDirection);  //for movements
+        //document.addEventListener("keyup", changeDirection);  //for movements
         // Set snake speed
         refreshIntervalId = setInterval(update, 1000 / 10);
     }
@@ -48,7 +48,7 @@ $(document).ready(function() {
      // Background of a Game
      context.fillStyle = "black";
      context.fillRect(0,0, canvas.width, canvas.height);
-
+     document.addEventListener("keyup", changeDirection); 
 
     function update() {
         if (gameOver) {
@@ -97,6 +97,7 @@ $(document).ready(function() {
             gameOver = true;
             socket.emit("gameover", id);
             alert("Game Over");
+            testgameover();
         }
      
         for (let i = 0; i < snakeBody.length; i++) {
@@ -106,6 +107,7 @@ $(document).ready(function() {
                 gameOver = true;
                 socket.emit("gameover", id);
                 alert("Game Over");
+                testgameover();
             }
         }
     }
@@ -178,7 +180,7 @@ $(document).ready(function() {
         socket.emit("login", inputValue);
         //$(`#login`).css("display", "none");
        login.style.display = "none";
-       loadgame();
+       //loadgame();
     });
 
     resetButton.addEventListener('click', function() {
@@ -205,6 +207,20 @@ $(document).ready(function() {
         testgameover();
     });
 
+    socket.on('matchmade', function(datavalue) {
+        //match has been made; start new game
+        console.log("match made from server");
+        alert("Match made. Game starting.");
+        loadgame();
+    });
+
+    socket.on('newgame', function(datavalue) {
+        //game has ended and someone won; start new game
+        console.log("new game from server");
+        alert("New game starting.");
+        reset();
+    });
+
     function testgameover(){
         if(gameOver){
             //is pubgameover? (is the game over for all)?
@@ -215,14 +231,14 @@ $(document).ready(function() {
             }
             else{
                 //wait
-                alert("Waiting; no winner yet");
+                alert("Waiting; other players are still going.");
             }
         }
     }
 
     function reset(){
         console.log("reset clicked");
-        snakebody = [];
+        snakeBody = [];
         gameOver = false;
         pubGameover = false;
         //clear rect
@@ -231,20 +247,21 @@ $(document).ready(function() {
         context.clearRect(0, 0, canvas.width, canvas.height);
         context.fillStyle = "black";
         context.fillRect(0,0, canvas.width, canvas.height);
-        context.fillStyle = "yellow";
-        context.fillRect(foodX, foodY, blockSize, blockSize);
+        //context.fillStyle = "yellow";
+        //context.fillRect(foodX, foodY, blockSize, blockSize);
         snakeX = blockSize * 5;
         snakeY = blockSize * 5;
         speedX = 0;
         speedY = 0;
         //placeFood();
-        context.fillStyle = "green";
+        //context.fillStyle = "green";
         /*
         snakeX += speedX * blockSize; //updating Snake position in X coordinate.
         snakeY += speedY * blockSize;  //updating Snake position in Y 
         */
-        context.fillRect(snakeX, snakeY, blockSize, blockSize);
-        refreshIntervalId = setInterval(update, 1000 / 10);
+        //context.fillRect(snakeX, snakeY, blockSize, blockSize);
+        //refreshIntervalId = setInterval(update, 1000 / 10);
+        loadgame();
     }
     //end onload
 });
