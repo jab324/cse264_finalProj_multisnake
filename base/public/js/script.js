@@ -96,7 +96,7 @@ $(document).ready(function() {
             console.log("out of bounds");
             gameOver = true;
             socket.emit("gameover", id);
-            alert("Game Over");
+            //alert("Game Over");
             testgameover();
         }
      
@@ -106,7 +106,7 @@ $(document).ready(function() {
                 console.log("ate self");
                 gameOver = true;
                 socket.emit("gameover", id);
-                alert("Game Over");
+                //alert("Game Over");
                 testgameover();
             }
         }
@@ -227,11 +227,11 @@ $(document).ready(function() {
             //if yes, then print winner
             //if no, then wait until winner
             if(pubGameover){
-                alert("Winner: " + winner);
+                alert("Gameover. Winner: " + winner);
             }
             else{
                 //wait
-                alert("Waiting; other players are still going.");
+                alert("Gameover. Waiting; other players are still going.");
             }
         }
     }
