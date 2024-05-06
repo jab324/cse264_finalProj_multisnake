@@ -7,8 +7,9 @@
 
 // let ROWS_IN_GRID = 8;
 // let COLS_IN_GRID = 10;
-const HOST = process.argv[2];
-const PORT = process.argv[3];
+const HOST = "neptune.cse.lehigh.edu";
+const PORT = 4040;
+let gameOn = false;
 // let grid = null;
 
 // Copied from: https://www.geeksforgeeks.org/how-to-create-a-guid-uuid-in-javascript/
@@ -51,6 +52,7 @@ class Player {
   constructor(login) {
     this.name = login;
     this.score = 0;
+    this.gameOver = false;
   }
 }
 
@@ -67,9 +69,42 @@ class PlayerList {
   updateScore(id) {
     const index = this.id2index[id];
     console.log(`updateScore: this.id2index[${id}] = ${index}`)
-    console.log(`before: ${this.players[index].name} ${this.players[index].score}`)
+    console.log(`before: ${this.players[index].score}`)
     this.players[index].score += 10;
-    console.log(`after: ${this.players[index].name} ${this.players[index].score}`)
+    console.log(`after: ${this.players[index].score}`)
+    updateStatus();
+  }
+
+  getWinner(){
+      let winner = this.players[0];
+      if(this.players.length === 1)
+          return winner;
+
+      for(let i = 0; i < this.players.length; i++) {
+        if(this.players[i].score > winner.score)
+            winner = this.players[i];
+      }
+      return winner;
+  }
+
+   changeGOStatus(id){
+    const index = this.id2index[id];
+    this.players[index].gameOver = true;
+    this.players.forEach(player => {
+      //console.log(player.gameOver);
+        if(!player.gameOver)
+            return false;
+    });
+    return true
+  }
+  
+  resetBoard(){
+    this.players.forEach(player => {
+      //console.log(player.gameOver);
+        player.score = 0;
+    });
+    updateStatus();
+    gameOn = true;
   }
 
   add(player) {
@@ -80,8 +115,22 @@ class PlayerList {
     console.log(`PlayerList:add(${player.name} ${player.score} ${id} ${this.id2index[id]} ${this.name2id[player.name]})`)
   }
 
+  remove(id){
+    const playerIndex = this.id2index[id];
+    const player = this.players.splice(playerIndex, 1)[0];
+    delete this.id2index[id];
+    delete this.name2[player.name];
+    console.log(`PlayerList:remove(${player.name})`);
+  }
+
   length() {
     return this.players.length;
+  }
+
+  getRandomId(){
+    const randomIndex = Math.floor(Math.random() * this.players.length);
+    const randId = this.players[randomIndex];
+    return randId
   }
 
   onList(id) {
@@ -101,6 +150,8 @@ class PlayerList {
       return "";
     }
   }
+
+
 
   dump() {
     for (i = 0; i < this.players.length; ++i) {
@@ -137,8 +188,7 @@ function processLogin(socket, loginname) {
     socket.emit("debug", `INFO: User ${filteredName} logged in with id ${newid}`)
     socket.emit("loginresponse",
       {
-        id: newid,
-        filteredusername: filteredName
+        id: newid
       }
     );
     updateStatus();
@@ -261,9 +311,6 @@ function processLogin(socket, loginname) {
 //   io.sockets.emit("chatbroadcast", message);
 // }
 
-function updateGrid() {
-  io.sockets.emit("gridupdate", grid);
-}
 
 function updateStatus() {
   const tmp = snakePlayers.players.map((t) => t)
@@ -271,9 +318,8 @@ function updateStatus() {
   io.sockets.emit("playerslistupdate", tmp);
 }
 
+
 // Create and fill the grid
-createGrid();
-initGrid();
 
 // Load the required libraries
 
@@ -299,10 +345,16 @@ const io = new Server(server, {
   }
 });
 
+
+
+
 // Listen for connections on PORT
 server.listen(PORT, HOST, () => { console.log(`Server running at http://${HOST}:${PORT}/`); });
 
 // Load the required libraries
+
+
+
 
 // Socket.IO code for setting up connection and sending initial hand and player list.
 io.on("connection",
@@ -317,15 +369,40 @@ io.on("connection",
     socket.on("eatpellet", (id) => {
         console.log(`processing pellet eaten: userid= ${id}`);
         //const name = snakePlayers.getName(id);
-        updateScore(id);
+        snakePlayers.updateScore(id);
     })
 
-    socket.on("powerdown", (cause) => {
+    socket.on("powerdown", (id) => {
         console.log("opponent will power down!");
+        
         socket.emit("playerPD", cause);
     })
-    if(snakePlayers.length === 2){
+
+    socket.on("gameover", (id) => {
+      const name = snakePlayers.getName(id);
+      console.log(`Player ${name} is done!`);
+      const done = snakePlayers.changeGOStatus(id);
+     // console.log(done);
+      if(done){
+        //console.log(name)
+        const ret = snakePlayers.getWinner();
+        const retName = ret.name;
+        console.log(retName);
+        socket.emit("winner", retName);
+        snakePlayers.resetBoard();
+      }
+    })
+
+    socket.on("leave", (id) => {
+      snakePlayers.remove(id);
+      updateStatus();
+    });
+
+    if(snakePlayers.length >= 2){
+        if(!gameOn){
+        gameOn = true;
         socket.emit("matchmade", true);
+        }
     }
     updateStatus();
   }
