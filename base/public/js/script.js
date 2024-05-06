@@ -28,19 +28,26 @@ let matchmade = false;
 
 let winner;
 
+let refreshIntervalId;
+
 const socket = io.connect('http://neptune.cse.lehigh.edu:4040');
 
 $(document).ready(function() {
+    function loadgame(){
+        placeFood();
+        document.addEventListener("keyup", changeDirection);  //for movements
+        // Set snake speed
+        refreshIntervalId = setInterval(update, 1000 / 10);
+    }
+
     canvas = document.getElementById("myCanvas");
     context = canvas.getContext("2d");
     canvas.height = total_row * blockSize;//30x20=600 pixels tall
     canvas.width = total_col * blockSize;//canvas is 50x20=1000 pixels wide
     context = canvas.getContext("2d");
- 
-    placeFood();
-    document.addEventListener("keyup", changeDirection);  //for movements
-    // Set snake speed
-    let refreshIntervalId = setInterval(update, 1000 / 10);
+     // Background of a Game
+     context.fillStyle = "black";
+     context.fillRect(0,0, canvas.width, canvas.height);
 
 
     function update() {
@@ -86,6 +93,7 @@ $(document).ready(function() {
             || snakeY > total_row * blockSize) { 
              
             //out of bounds
+            console.log("out of bounds");
             gameOver = true;
             socket.emit("gameover", id);
             alert("Game Over");
@@ -94,6 +102,7 @@ $(document).ready(function() {
         for (let i = 0; i < snakeBody.length; i++) {
             if (snakeX == snakeBody[i][0] && snakeY == snakeBody[i][1]) { 
                 //eats own body
+                console.log("ate self");
                 gameOver = true;
                 socket.emit("gameover", id);
                 alert("Game Over");
@@ -138,6 +147,7 @@ $(document).ready(function() {
     const loginInput = document.getElementById('loginInput');
     const loginButton = document.getElementById('loginButton');
     const resetButton = document.getElementById('resetButton');
+    const loadButton = document.getElementById('loadButton');
 
     function displayPlayerList(plist){
         $("#tablebody tr").remove(); 
@@ -168,6 +178,7 @@ $(document).ready(function() {
         socket.emit("login", inputValue);
         //$(`#login`).css("display", "none");
        login.style.display = "none";
+       loadgame();
     });
 
     resetButton.addEventListener('click', function() {
