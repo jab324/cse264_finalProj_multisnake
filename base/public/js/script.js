@@ -23,6 +23,10 @@ let foodX;
 let foodY;
  
 let gameOver = false;
+let pubGameover = false;
+let matchmade = false;
+
+let winner;
 
 const socket = io.connect('http://neptune.cse.lehigh.edu:4040');
 
@@ -36,11 +40,12 @@ $(document).ready(function() {
     placeFood();
     document.addEventListener("keyup", changeDirection);  //for movements
     // Set snake speed
-    setInterval(update, 1000 / 10);
+    let refreshIntervalId = setInterval(update, 1000 / 10);
 
 
     function update() {
         if (gameOver) {
+            clearInterval(refreshIntervalId);
             return;
         }
      
@@ -53,7 +58,7 @@ $(document).ready(function() {
         context.fillRect(foodX, foodY, blockSize, blockSize);
      
         if (snakeX == foodX && snakeY == foodY) {
-            socket.emit("eatPellet", id);
+            socket.emit("eatpellet", id);
             snakeBody.push([foodX, foodY]);
             placeFood();
         }
@@ -80,16 +85,17 @@ $(document).ready(function() {
             || snakeY < 0 
             || snakeY > total_row * blockSize) { 
              
-            // Out of bound condition
+            //out of bounds
             gameOver = true;
+            socket.emit("gameover", id);
             alert("Game Over");
         }
      
         for (let i = 0; i < snakeBody.length; i++) {
             if (snakeX == snakeBody[i][0] && snakeY == snakeBody[i][1]) { 
-                 
-                // Snake eats own body
+                //eats own body
                 gameOver = true;
+                socket.emit("gameover", id);
                 alert("Game Over");
             }
         }
@@ -131,6 +137,28 @@ $(document).ready(function() {
     const login = document.getElementById('login');
     const loginInput = document.getElementById('loginInput');
     const loginButton = document.getElementById('loginButton');
+    const resetButton = document.getElementById('resetButton');
+
+    function displayPlayerList(plist){
+        $("#tablebody tr").remove(); 
+        //accepts an array of arrays with 2 fields
+        const body = document.getElementById('tablebody');
+        plist.forEach(player => {
+            const row = document.createElement('tr');
+            const nameCell = document.createElement('td');
+            nameCell.textContent = player.name;
+            //player.name?
+            const scoreCell = document.createElement('td');
+            scoreCell.textContent = player.score;
+            //player.score?
+            //depends on object setup
+            row.appendChild(nameCell);
+            row.appendChild(scoreCell);
+            body.appendChild(row);
+        });
+        const table = document.getElementById('myTable');
+        table.appendChild(body);
+    }
 
     loginButton.addEventListener('click', function() {
         //value of text input
@@ -142,10 +170,70 @@ $(document).ready(function() {
        login.style.display = "none";
     });
 
+    resetButton.addEventListener('click', function() {
+        reset();
+    });
+
     socket.on('loginresponse', function(datavalue) {
         //do something with datavalue.
         id = datavalue.id;
         console.log(id);
     });
+
+    socket.on('playerslistupdate', function(datavalue) {
+        //do something with datavalue.
+        console.log("playerlistupdate received from server");
+        displayPlayerList(datavalue);
+    });
+
+    socket.on('winner', function(datavalue) {
+        //do something with datavalue.
+        console.log("winner received from server");
+        pubGameover = true;
+        winner = datavalue;
+        testgameover();
+    });
+
+    function testgameover(){
+        if(gameOver){
+            //is pubgameover? (is the game over for all)?
+            //if yes, then print winner
+            //if no, then wait until winner
+            if(pubGameover){
+                alert("Winner: " + winner);
+            }
+            else{
+                //wait
+                alert("Waiting; no winner yet");
+            }
+        }
+    }
+
+    function reset(){
+        console.log("reset clicked");
+        snakebody = [];
+        gameOver = false;
+        pubGameover = false;
+        //clear rect
+        canvas = document.getElementById("myCanvas");
+        context = canvas.getContext("2d");
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = "black";
+        context.fillRect(0,0, canvas.width, canvas.height);
+        context.fillStyle = "yellow";
+        context.fillRect(foodX, foodY, blockSize, blockSize);
+        snakeX = blockSize * 5;
+        snakeY = blockSize * 5;
+        speedX = 0;
+        speedY = 0;
+        //placeFood();
+        context.fillStyle = "green";
+        /*
+        snakeX += speedX * blockSize; //updating Snake position in X coordinate.
+        snakeY += speedY * blockSize;  //updating Snake position in Y 
+        */
+        context.fillRect(snakeX, snakeY, blockSize, blockSize);
+        refreshIntervalId = setInterval(update, 1000 / 10);
+    }
     //end onload
 });

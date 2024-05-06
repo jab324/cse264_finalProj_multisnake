@@ -46,6 +46,12 @@ body {
   top: 620px;
 }
 
+#reset{
+  position: absolute;
+  left: 1213px;
+  top: 590px;
+}
+
 #myTable{
   position: absolute;
   border: 1px solid lime;
