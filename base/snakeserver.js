@@ -10,6 +10,7 @@
 const HOST = "neptune.cse.lehigh.edu";
 const PORT = 4040;
 let gameOn = false;
+let started = false;
 // let grid = null;
 
 // Copied from: https://www.geeksforgeeks.org/how-to-create-a-guid-uuid-in-javascript/
@@ -87,24 +88,30 @@ class PlayerList {
       return winner;
   }
 
-   changeGOStatus(id){
+  changeGOStatus(id) {
     const index = this.id2index[id];
     this.players[index].gameOver = true;
-    this.players.forEach(player => {
-      //console.log(player.gameOver);
-        if(!player.gameOver)
-            return false;
-    });
-    return true
+    console.log(`Player ${this.players[index].name} Game Over`);
+  
+    const allPlayersGameOver = this.players.every(player => player.gameOver);
+    if (allPlayersGameOver) {
+      console.log("All players are Game Over");
+      return true;
+    } else {
+      console.log("Not all players are Game Over");
+      return false;
+    }
   }
+  
   
   resetBoard(){
     this.players.forEach(player => {
       //console.log(player.gameOver);
         player.score = 0;
+        player.gameOver = false;
     });
     updateStatus();
-    gameOn = true;
+    gameOn = false;
   }
 
   add(player) {
@@ -346,6 +353,14 @@ const io = new Server(server, {
 });
 
 
+//https://stackoverflow.com/questions/951021/what-is-the-javascript-version-of-sleep
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+
+
 
 
 // Listen for connections on PORT
@@ -364,6 +379,16 @@ io.on("connection",
 
     socket.on("login", (loginname) => {
       processLogin(socket, loginname);
+      console.log(`Number of players: ${snakePlayers.length()}`);
+      if(snakePlayers.length() >= 2){
+ 
+          if(!started){
+          console.log("two players!");
+          started = true;
+          sleep(1000)
+          socket.emit("matchmade", true);
+          }
+      }
     })
 
     socket.on("eatpellet", (id) => {
@@ -380,16 +405,19 @@ io.on("connection",
 
     socket.on("gameover", (id) => {
       const name = snakePlayers.getName(id);
-      console.log(`Player ${name} is done!`);
+      ///console.log(`Player ${name} is done!`);
       const done = snakePlayers.changeGOStatus(id);
-     // console.log(done);
+      
+      console.log(done);
       if(done){
         //console.log(name)
         const ret = snakePlayers.getWinner();
         const retName = ret.name;
-        console.log(retName);
-        socket.emit("winner", retName);
+        //console.log(retName);
         snakePlayers.resetBoard();
+        socket.emit("winner", retName);
+        sleep(4000);
+        socket.emit("newgame", true);
       }
     })
 
@@ -398,12 +426,7 @@ io.on("connection",
       updateStatus();
     });
 
-    if(snakePlayers.length >= 2){
-        if(!gameOn){
-        gameOn = true;
-        socket.emit("matchmade", true);
-        }
-    }
+    
     updateStatus();
   }
 );
