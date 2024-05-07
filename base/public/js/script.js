@@ -26,6 +26,7 @@ let foodX;
 let foodY;
 let pdX;
 let pdY;
+let speedScale = 1;
  
 let gameOver = false;
 let pubGameover = false;
@@ -141,23 +142,23 @@ $(document).ready(function() {
         if (e.code == "ArrowUp" && speedY != 1) { 
             // If up arrow key pressed with this condition...
             // snake will not move in the opposite direction
-            speedX = 0;
-            speedY = -1;
+            speedX = 0*speedScale;
+            speedY = -1*speedScale;
         }
         else if (e.code == "ArrowDown" && speedY != -1) {
             //If down arrow key pressed
-            speedX = 0;
-            speedY = 1;
+            speedX = 0*speedScale;
+            speedY = 1*speedScale;
         }
         else if (e.code == "ArrowLeft" && speedX != 1) {
             //If left arrow key pressed
-            speedX = -1;
-            speedY = 0;
+            speedX = -1*speedScale;
+            speedY = 0*speedScale;
         }   
         else if (e.code == "ArrowRight" && speedX != -1) { 
             //If Right arrow key pressed
-            speedX = 1;
-            speedY = 0;
+            speedX = 1*speedScale;
+            speedY = 0*speedScale;
         }
     }
 
@@ -315,14 +316,12 @@ $(document).ready(function() {
 
     function triggerPowerdown(){
         //speed up for 10 secs, then slow down
-        speedX = 3;
-        speedY = 3;
+        speedScale = 3;
         setTimeout(resetSpeed, 10000);
     }
 
     function resetSpeed(){
-        speedX = 0;
-        speedY = 0;
+        speedScale = 1;
     }
 
     //end onload
