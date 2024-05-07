@@ -1,6 +1,9 @@
 //define global vars
 //adust and reference citation...
 ///https://www.geeksforgeeks.org/create-a-snake-game-using-html-css-and-javascript/
+//Sweet alert for popups
+//import Swal from 'sweetalert2';
+
 let id = "";
 
 let blockSize = 20;//size of a cell in grid 
@@ -25,6 +28,7 @@ let foodY;
 let gameOver = false;
 let pubGameover = false;
 let matchmade = false;
+let loggedIn = false;
 
 let winner;
 
@@ -49,7 +53,14 @@ $(document).ready(function() {
      context.fillStyle = "black";
      context.fillRect(0,0, canvas.width, canvas.height);
      document.addEventListener("keyup", changeDirection); 
-
+    /*
+     Swal.fire({
+        title: "Welcome to MultiSnake!",
+        text: "The rules are simple -- its just like Snake, but multiplayer (and with some powerups)! <b>First, login with a username on the right.</b> The server will wait until at least 2 players join.<br>Then, it will make a match and play will start (rendering the snake) and allowing you to move. You can move with the arrow keys on your keyboard. Avoid the boundaries and avoid eating yourself, and eat food to score!",
+        icon: "info",
+        showCloseButton: true,
+    });
+    */
     function update() {
         if (gameOver) {
             clearInterval(refreshIntervalId);
@@ -96,8 +107,8 @@ $(document).ready(function() {
             console.log("out of bounds");
             gameOver = true;
             socket.emit("gameover", id);
-            //alert("Game Over");
-            testgameover();
+            alert("Game Over");
+            //testgameover();
         }
      
         for (let i = 0; i < snakeBody.length; i++) {
@@ -106,8 +117,8 @@ $(document).ready(function() {
                 console.log("ate self");
                 gameOver = true;
                 socket.emit("gameover", id);
-                //alert("Game Over");
-                testgameover();
+                alert("Game Over");
+                //testgameover();
             }
         }
     }
@@ -178,6 +189,7 @@ $(document).ready(function() {
         loginInput.value = '';
         //send login string to server and in handler, receive and save id?
         socket.emit("login", inputValue);
+        loggedIn = true;
         //$(`#login`).css("display", "none");
        login.style.display = "none";
        //loadgame();
@@ -211,14 +223,18 @@ $(document).ready(function() {
         //match has been made; start new game
         console.log("match made from server");
         alert("Match made. Game starting.");
-        loadgame();
+        if(loggedIn){
+            loadgame();
+        }
     });
 
     socket.on('newgame', function(datavalue) {
         //game has ended and someone won; start new game
         console.log("new game from server");
         alert("New game starting.");
-        reset();
+        if(loggedIn){
+            reset();
+        }
     });
 
     function testgameover(){
@@ -253,6 +269,8 @@ $(document).ready(function() {
         snakeY = blockSize * 5;
         speedX = 0;
         speedY = 0;
+        //below line for testing, to see if fixes snake speed problem
+        clearInterval(refreshIntervalId);
         //placeFood();
         //context.fillStyle = "green";
         /*
@@ -263,5 +281,6 @@ $(document).ready(function() {
         //refreshIntervalId = setInterval(update, 1000 / 10);
         loadgame();
     }
+
     //end onload
 });
