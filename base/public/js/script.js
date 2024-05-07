@@ -105,8 +105,8 @@ $(document).ready(function() {
         }
      
         context.fillStyle = "green";
-        snakeX += speedX * blockSize; //updating Snake position in X coordinate.
-        snakeY += speedY * blockSize;  //updating Snake position in Y coordinate.
+        snakeX += (speedX*speedScale) * blockSize; //updating Snake position in X coordinate.
+        snakeY += (speedY*speedScale) * blockSize;  //updating Snake position in Y coordinate.
         context.fillRect(snakeX, snakeY, blockSize, blockSize);
         for (let i = 0; i < snakeBody.length; i++) {
             context.fillRect(snakeBody[i][0], snakeBody[i][1], blockSize, blockSize);
@@ -142,23 +142,23 @@ $(document).ready(function() {
         if (e.code == "ArrowUp" && speedY != 1) { 
             // If up arrow key pressed with this condition...
             // snake will not move in the opposite direction
-            speedX = 0*speedScale;
-            speedY = -1*speedScale;
+            speedX = 0;
+            speedY = -1;
         }
         else if (e.code == "ArrowDown" && speedY != -1) {
             //If down arrow key pressed
-            speedX = 0*speedScale;
-            speedY = 1*speedScale;
+            speedX = 0;
+            speedY = 1;
         }
         else if (e.code == "ArrowLeft" && speedX != 1) {
             //If left arrow key pressed
-            speedX = -1*speedScale;
-            speedY = 0*speedScale;
+            speedX = -1;
+            speedY = 0;
         }   
         else if (e.code == "ArrowRight" && speedX != -1) { 
             //If Right arrow key pressed
-            speedX = 1*speedScale;
-            speedY = 0*speedScale;
+            speedX = 1;
+            speedY = 0;
         }
     }
 
@@ -181,7 +181,7 @@ $(document).ready(function() {
     const loginInput = document.getElementById('loginInput');
     const loginButton = document.getElementById('loginButton');
     const resetButton = document.getElementById('resetButton');
-    const loadButton = document.getElementById('loadButton');
+    //const loadButton = document.getElementById('loadButton');
 
     function displayPlayerList(plist){
         $("#tablebody tr").remove(); 
@@ -261,12 +261,17 @@ $(document).ready(function() {
     socket.on('playerpowerdown', function(datavalue) {
         //game has ended and someone won; start new game
         const pdID = datavalue.id;
+        console.log("powerdown received from server, id: %s", id);
         if(pdID == id){
             //speed up for x seconds
+            console.log('id match');
             triggerPowerdown();
         }
+        else{
+            console.log('not id match');
+        }
         //else, we werent assigned the powerdown
-        console.log("powerdown received from server, id: %s", id);
+        
     });
 
     function testgameover(){
