@@ -354,7 +354,7 @@ $(document).ready(function() {
 
     function triggerPowerdown(){
         //speed up for 10 secs, then slow down
-        speedScale = 1.5;
+        speedScale = 2;
         setTimeout(resetSpeed, 5000);
     }
 
