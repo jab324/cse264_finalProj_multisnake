@@ -3,7 +3,7 @@
 ///https://www.geeksforgeeks.org/create-a-snake-game-using-html-css-and-javascript/
 //Sweet alert for popups
 //import Swal from 'sweetalert2';
-
+//import Swal from '../../app.js';
 let id = "";
 
 let blockSize = 20;//size of a cell in grid 
@@ -24,6 +24,8 @@ let snakeBody = [];
  
 let foodX;
 let foodY;
+let pdX;
+let pdY;
  
 let gameOver = false;
 let pubGameover = false;
@@ -37,6 +39,14 @@ let refreshIntervalId;
 const socket = io.connect('http://neptune.cse.lehigh.edu:4040');
 
 $(document).ready(function() {
+    /*
+    Swal.fire({
+        title: "Welcome to MultiSnake!",
+        text: "The rules are simple -- its just like Snake, but multiplayer (and with some powerups)! <b>First, login with a username on the right.</b> The server will wait until at least 2 players join.<br>Then, it will make a match and play will start (rendering the snake) and allowing you to move. You can move with the arrow keys on your keyboard. Avoid the boundaries and avoid eating yourself, and eat food to score!",
+        icon: "info",
+        showCloseButton: true,
+    });
+    */
     function loadgame(){
         placeFood();
         //document.addEventListener("keyup", changeDirection);  //for movements
@@ -53,14 +63,7 @@ $(document).ready(function() {
      context.fillStyle = "black";
      context.fillRect(0,0, canvas.width, canvas.height);
      document.addEventListener("keyup", changeDirection); 
-    /*
-     Swal.fire({
-        title: "Welcome to MultiSnake!",
-        text: "The rules are simple -- its just like Snake, but multiplayer (and with some powerups)! <b>First, login with a username on the right.</b> The server will wait until at least 2 players join.<br>Then, it will make a match and play will start (rendering the snake) and allowing you to move. You can move with the arrow keys on your keyboard. Avoid the boundaries and avoid eating yourself, and eat food to score!",
-        icon: "info",
-        showCloseButton: true,
-    });
-    */
+    
     function update() {
         if (gameOver) {
             clearInterval(refreshIntervalId);
@@ -74,11 +77,20 @@ $(document).ready(function() {
         // Set food color and position
         context.fillStyle = "yellow";
         context.fillRect(foodX, foodY, blockSize, blockSize);
-     
+
+        //set powerdown color and position
+        context.fillStyle = "red";
+        context.fillRect(pdX, pdY, blockSize, blockSize);
+        
         if (snakeX == foodX && snakeY == foodY) {
             socket.emit("eatpellet", id);
             snakeBody.push([foodX, foodY]);
             placeFood();
+        }
+
+        if (snakeX == pdX && snakeY == pdY) {
+            socket.emit("powerdown", id);
+            placePD();
         }
      
         // body of snake will grow
@@ -150,6 +162,13 @@ $(document).ready(function() {
 
     // Randomly place food
     function placeFood() {
+        // in x coordinates.
+        foodX = Math.floor(Math.random() * total_col) * blockSize; 
+        //in y coordinates.
+        foodY = Math.floor(Math.random() * total_row) * blockSize; 
+    }
+
+    function placePD() {
         // in x coordinates.
         foodX = Math.floor(Math.random() * total_col) * blockSize; 
         //in y coordinates.
@@ -237,6 +256,17 @@ $(document).ready(function() {
         }
     });
 
+    socket.on('playerpowerdown', function(datavalue) {
+        //game has ended and someone won; start new game
+        const pdID = datavalue.id;
+        if(pdID == id){
+            //speed up for x seconds
+            triggerPowerdown();
+        }
+        //else, we werent assigned the powerdown
+        console.log("powerdown received from server, id: %s", id);
+    });
+
     function testgameover(){
         if(gameOver){
             //is pubgameover? (is the game over for all)?
@@ -280,6 +310,18 @@ $(document).ready(function() {
         //context.fillRect(snakeX, snakeY, blockSize, blockSize);
         //refreshIntervalId = setInterval(update, 1000 / 10);
         loadgame();
+    }
+
+    function triggerPowerdown(){
+        //speed up for 10 secs, then slow down
+        speedX = 3;
+        speedY = 3;
+        setTimeout(resetSpeed, 10000)
+    }
+
+    function resetSpeed(){
+        speedX = 0;
+        speedY = 0;
     }
 
     //end onload

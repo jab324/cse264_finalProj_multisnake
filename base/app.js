@@ -5,6 +5,7 @@ CSE264 Final - MultiSnake
 
 const express = require("express");
 const path = require("path");
+//const Swal = require('sweetalert2')
 
 const app = express();
 
