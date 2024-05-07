@@ -33,6 +33,8 @@ let pubGameover = false;
 let matchmade = false;
 let loggedIn = false;
 
+let username;
+
 let winner;
 
 let refreshIntervalId;
@@ -48,6 +50,34 @@ $(document).ready(function() {
         showCloseButton: true,
     });
     */
+    const popup = new Popup({
+        id: "instructions",
+        title: "Game Instructions",
+        content: `
+            1. Welcome to MultiSnake! The rules are simple -- and just like Snake, with multiplayer functionality and powerups!
+            2. Login at the right first; nothing will happen before this. After logging in, avoid refreshing the page. This will bot you from the session.
+            3. Yellow squares are food (get points), red squares are powerdowns (speed up another random player), and blue squares are powerups (make food more valuable for 10 seconds).
+            4. The game ends when all players who are playing die; the winner is the user with the highest score. 
+            `,
+        backgroundColor: "#000",
+        titleColor: "#fff",
+        textColor: "#fff",
+        closeColor: "#fff",
+        borderWidth: ".2em",
+        borderColor: "#fff",
+        linkColor: "#fff",
+        fontSizeMultiplier: 1.1,
+        titleMargin: "4%",
+        fixedHeight: true,
+        widthMultiplier: 1.8,
+        heightMultiplier: 0.8,
+        showOnce: true,
+        css: `
+        .popup {
+            
+        }`
+    });
+    popup.show();
     function loadgame(){
         placeFood();
         placePD();
@@ -212,7 +242,8 @@ $(document).ready(function() {
         socket.emit("login", inputValue);
         loggedIn = true;
         //$(`#login`).css("display", "none");
-       login.style.display = "none";
+        login.style.display = "none";
+        username = inputValue;
        //loadgame();
     });
 
@@ -260,8 +291,9 @@ $(document).ready(function() {
 
     socket.on('playerpowerdown', function(datavalue) {
         //game has ended and someone won; start new game
-        const pdID = datavalue.id;
-        console.log("powerdown received from server, id: %s", id);
+        //const pdID = datavalue.id;
+        const pdID = datavalue;
+        console.log("powerdown received from server, id: %s", pdID);
         if(pdID == id){
             //speed up for x seconds
             console.log('id match');
@@ -306,6 +338,7 @@ $(document).ready(function() {
         snakeY = blockSize * 5;
         speedX = 0;
         speedY = 0;
+        speedScale = 1;
         //below line for testing, to see if fixes snake speed problem
         clearInterval(refreshIntervalId);
         //placeFood();
@@ -321,7 +354,7 @@ $(document).ready(function() {
 
     function triggerPowerdown(){
         //speed up for 10 secs, then slow down
-        speedScale = 3;
+        speedScale = 1.5;
         setTimeout(resetSpeed, 10000);
     }
 
