@@ -312,6 +312,7 @@ io.on("connection",
     socket.on("disconnect", () => {
       snakePlayers.remove(socket.id);
       console.log(`player disconnected: ${socket.id}`);
+      updateStatus();
     })
 
     
