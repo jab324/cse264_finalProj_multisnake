@@ -49,6 +49,7 @@ $(document).ready(function() {
     */
     function loadgame(){
         placeFood();
+        placePD();
         //document.addEventListener("keyup", changeDirection);  //for movements
         // Set snake speed
         refreshIntervalId = setInterval(update, 1000 / 10);
@@ -77,16 +78,16 @@ $(document).ready(function() {
         // Set food color and position
         context.fillStyle = "yellow";
         context.fillRect(foodX, foodY, blockSize, blockSize);
-
-        //set powerdown color and position
-        context.fillStyle = "red";
-        context.fillRect(pdX, pdY, blockSize, blockSize);
         
         if (snakeX == foodX && snakeY == foodY) {
             socket.emit("eatpellet", id);
             snakeBody.push([foodX, foodY]);
             placeFood();
         }
+
+        //set powerdown color and position
+        context.fillStyle = "red";
+        context.fillRect(pdX, pdY, blockSize, blockSize);
 
         if (snakeX == pdX && snakeY == pdY) {
             socket.emit("powerdown", id);
@@ -170,9 +171,9 @@ $(document).ready(function() {
 
     function placePD() {
         // in x coordinates.
-        foodX = Math.floor(Math.random() * total_col) * blockSize; 
+        pdX = Math.floor(Math.random() * total_col) * blockSize; 
         //in y coordinates.
-        foodY = Math.floor(Math.random() * total_row) * blockSize; 
+        pdY = Math.floor(Math.random() * total_row) * blockSize; 
     }
 
     const login = document.getElementById('login');
@@ -316,7 +317,7 @@ $(document).ready(function() {
         //speed up for 10 secs, then slow down
         speedX = 3;
         speedY = 3;
-        setTimeout(resetSpeed, 10000)
+        setTimeout(resetSpeed, 10000);
     }
 
     function resetSpeed(){
