@@ -1,7 +1,10 @@
-/* FruitSmash Game Server
+/* Snake Game Server
  Chris Girouard and Joe Bereswill
 
  */
+
+
+//This code is based off of Professor Femisters 'FruitSmashServer.js' code. 
 
 // Constants
 
@@ -23,27 +26,6 @@ function uuidv4() {
     });
 }
 
-// function createGrid() {
-//   grid = new Array(8);
-//   let r = 0, c = 0;
-//   for (r = 0; r < 8; ++r) {
-//     grid[r] = new Array(10);
-//     for (c = 0; c < 10; ++c)
-//       grid[r][c] = 0;
-//   }
-// }
-
-// function initGrid() {
-//   let r = 0, c = 0;
-//   for (r = 0; r < 8; ++r) {
-//     for (c = 0; c < 10; ++c)
-//       grid[r][c] = Math.floor(Math.random() * 7) + 1;
-//   }
-// }
-
-// function log(fcn, ctx, e) {
-//   console.log(fcn + ': Error on input (' + ctx + ') ' + e.toString());
-// }
 
 /****************
  * Player Class *
@@ -221,121 +203,7 @@ function processLogin(socket, loginname) {
   }
 }
 
-// function replaceTriple(row1, col1, row2, col2, row3, col3) {
-//   grid[row1][col1] = Math.floor(Math.random() * 7) + 1;
-//   grid[row2][col2] = Math.floor(Math.random() * 7) + 1;
-//   grid[row3][col3] = Math.floor(Math.random() * 7) + 1;
-// }
 
-// function isScore(image1Col, image1Row, image2Col, image2Row) {
-//   if (image1Col < 0 || image1Col > 9 || image2Col < 0 || image2Col > 9 || 
-//       image1Row < 0 || image1Row > 7 || image2Row < 0 || image2Row > 7) {
-//     socket.emit("debug", `ERROR: row and/or col numbers out of range.`);
-//     return false;
-//   }
-
-// }
-
-
-/*
- * isTriple is adapted from Shawn Thieke's client code
- *
- */
-// function isTriple(socket, firstSelect_column, firstSelect_row, secondSelect_column, secondSelect_row) {
-//   if (firstSelect_column < 0 || firstSelect_column > 9 || secondSelect_column < 0 || secondSelect_column > 9 || firstSelect_row < 0 || firstSelect_row > 7 || secondSelect_row < 0 || secondSelect_row > 7) {
-//     socket.emit("debug", `ERROR: row and/or col numbers out of range.`);
-//     return false;
-//   }
-//   //store start array values
-//   const origional1 = grid[firstSelect_row][firstSelect_column];
-//   const origional2 = grid[secondSelect_row][secondSelect_column];
-//   //perform swap in array
-//   grid[firstSelect_row][firstSelect_column] = origional2;
-//   grid[secondSelect_row][secondSelect_column] = origional1;
-//   //check new location of firstSelect
-//   for (var x = firstSelect_column - 2; x <= firstSelect_column; x++) {
-//     //check that we are in the array bounds
-//     if (x >= 0 && x + 2 < grid[firstSelect_row].length) {
-//       if (grid[firstSelect_row][x] === grid[firstSelect_row][x + 1] &&
-//         grid[firstSelect_row][x] === grid[firstSelect_row][x + 2]) {
-//         //reset the array, we have found a match
-//         //grid[firstSelect_row][firstSelect_column] = origional1;
-//         //grid[secondSelect_row][secondSelect_column] = origional2;
-//         replaceTriple(firstSelect_row, x, firstSelect_row, x + 1, firstSelect_row, x + 2);
-//         return true;
-//       }
-//     }
-//   }
-//   for (let y = firstSelect_row - 2; y <= firstSelect_row; y++) {
-//     //check that we are in the array bounds
-//     if (y >= 0 && y + 2 < grid.length) {
-//       if (grid[y][firstSelect_column] === grid[y + 1][firstSelect_column] && grid[y][firstSelect_column] === grid[y + 2][firstSelect_column]) {
-//         //reset the array, we have found a match
-//         //grid[firstSelect_row][firstSelect_column] = origional1;
-//         //grid[secondSelect_row][secondSelect_column] = origional2;
-//         replaceTriple(y, firstSelect_column, y + 1, firstSelect_column, y + 2, firstSelect_column);
-//         return true;
-//       }
-//     }
-//   }
-//   //check new locations for second select
-//   for (let x = secondSelect_column - 2; x <= secondSelect_column; x++) {
-//     //check that we are in the array bounds
-//     if (x >= 0 && x + 2 < grid[secondSelect_row].length) {
-//       if (grid[secondSelect_row][x] === grid[secondSelect_row][x + 1] && grid[secondSelect_row][x] === grid[secondSelect_row][x + 2]) {
-//         //reset the array, we have found a match
-//         //grid[firstSelect_row][firstSelect_column] = origional1;
-//         //grid[secondSelect_row][secondSelect_column] = origional2;
-//         replaceTriple(secondSelect_row, x, secondSelect_row, x + 1, secondSelect_row, x + 2);
-//         return true;
-//       }
-//     }
-//   }
-//   for (let y = secondSelect_row - 2; y <= secondSelect_row; y++) {
-//     //check that we are in the array bounds
-//     if (y >= 0 && y + 2 < grid.length) {
-//       if (grid[y][secondSelect_column] === grid[y + 1][secondSelect_column] && grid[y][secondSelect_column] === grid[y + 2][secondSelect_column]) {
-//         //reset the array, we have found a match
-//         //grid[firstSelect_row][firstSelect_column] = origional1;
-//         //grid[secondSelect_row][secondSelect_column] = origional2;
-//         replaceTriple(y, secondSelect_column, y + 1, secondSelect_column, y + 2, secondSelect_column);
-//         return true;
-//       }
-//     }
-//   }
-//   //reset the array
-//   //grid[firstSelect_row][firstSelect_column] = origional1;
-//   //grid[secondSelect_row][secondSelect_column] = origional2;
-//   return false;
-// }
-
-// function processSwap(socket, obj) {
-//   const tile1x = obj.image1Col;
-//   const tile1y = obj.image1Row;
-//   const tile2x = obj.image2Col;
-//   const tile2y = obj.image2Row;
-//   const id = obj.id;
-
-//   console.log(`processSwap: ${obj}`);
-//   console.log(`processing swap request: userid= ${id}`);
-//   console.log(`tile1x= ${tile1x} tile1y= ${tile1y} tile2x= ${tile2x} tile2y= ${tile2y}`);
-//   socket.emit("debug", `INFO: images swapped at (row,col) (${tile1y},${tile1x}) and (${tile2y},${tile2x})`)
-
-//   if (isTriple(socket, tile1x, tile1y, tile2x, tile2y)) {
-//     socket.emit("debug", `Triple found.`)
-//     fruitSmashPlayers.updateScore(id);
-//     console.log('processSwap: Pair Accepted ');
-//     updateGrid();
-//     updateStatus();
-
-//   } else {
-//     socket.emit("debug", `Triple not found.`)
-//   }
-// }
-
-// function updateChat(message) {
-//   io.sockets.emit("chatbroadcast", message);
-// }
 
 
 function updateStatus() {
@@ -416,8 +284,11 @@ io.on("connection",
 
     socket.on("powerdown", (id) => {
         console.log("opponent will power down!");
-        
-        socket.emit("playerPD", cause);
+        let randId = snakePlayers.getRandomId();
+        while(randId === id )
+          randId = snakePlayers.getRandomId();
+
+        io.emit("playerPD", randId);
     })
 
     socket.on("gameover", (id) => {
@@ -441,11 +312,6 @@ io.on("connection",
     socket.on("disconnect", () => {
       snakePlayers.remove(socket.id);
       console.log(`player disconnected: ${socket.id}`);
-    })
-
-    socket.on("leave", (id) => {
-      snakePlayers.remove(id);
-      updateStatus();
     })
 
     
