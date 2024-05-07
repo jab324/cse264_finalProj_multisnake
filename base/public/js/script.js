@@ -1,6 +1,8 @@
 //define global vars
-//adust and reference citation...
+//reference/citation...
 ///https://www.geeksforgeeks.org/create-a-snake-game-using-html-css-and-javascript/
+//Code skeleton from above; highly modified for multiplayer functionality (and powerups). Modifications were inpsired, but not directly copied, from the socket.io calls from CSE264 - Prog7.
+
 //Sweet alert for popups
 //import Swal from 'sweetalert2';
 //import Swal from '../../app.js';
@@ -50,6 +52,7 @@ $(document).ready(function() {
         showCloseButton: true,
     });
     */
+   /*
     const popup = new Popup({
         id: "instructions",
         title: "Game Instructions",
@@ -77,7 +80,9 @@ $(document).ready(function() {
             
         }`
     });
-    //popup.show();
+    popup.show();
+    */
+    //deprecated above, doesn't work on chrome (but works on safari)
     function loadgame(){
         placeFood();
         placePD();
