@@ -50,11 +50,12 @@ function uuidv4() {
  ****************/
 
 class Player {
-  constructor(login) {
+  constructor(login, game) {
     this.name = login;
     this.score = 0;
-    this.gameOver = false;
+    this.gameOver = game;
   }
+
 }
 
 // PlayerList Class
@@ -65,6 +66,7 @@ class PlayerList {
     this.players = new Array();
     this.id2index = {};
     this.name2id = {};
+    this.socket2index = {};
   }
 
   updateScore(id) {
@@ -114,20 +116,31 @@ class PlayerList {
     gameOn = false;
   }
 
-  add(player) {
+  add(player, socket) {
     this.players.push(player);
     const id = uuidv4();
     this.id2index[id] = this.players.length - 1;
     this.name2id[player.name] = id;
+    this.socket2index[socket.id] = this.players.length -1;
     console.log(`PlayerList:add(${player.name} ${player.score} ${id} ${this.id2index[id]} ${this.name2id[player.name]})`)
   }
 
-  remove(id){
-    const playerIndex = this.id2index[id];
+  remove(socketId){
+    if(socketId === ""){
+      console.log("Invalid socket ID for removal");
+      return;
+    }
+    const playerIndex = this.socket2index[socketId];
+    if (playerIndex === undefined) {
+      console.log(`Player with socket ID ${socketId} not found.`);
+      return;
+    }
     const player = this.players.splice(playerIndex, 1)[0];
-    delete this.id2index[id];
-    delete this.name2[player.name];
+    delete this.id2index[player.id];
+    delete this.name2id[player.name];
+    delete this.socket2index[socketId];
     console.log(`PlayerList:remove(${player.name})`);
+    
   }
 
   length() {
@@ -188,7 +201,13 @@ function processLogin(socket, loginname) {
       filteredName += "*";
       id = snakePlayers.getId(filteredName);
     }
-    snakePlayers.add(new Player(filteredName));
+    if(started){
+      snakePlayers.add(new Player(filteredName, true), socket);
+
+    }
+    else{
+      snakePlayers.add(new Player(filteredName, false), socket);
+    }
     const newid = snakePlayers.getId(filteredName);
     console.log(
       `processLogin: name= ${loginname} filtered name= ${filteredName} new id=${newid}`);
@@ -380,16 +399,14 @@ io.on("connection",
     socket.on("login", (loginname) => {
       processLogin(socket, loginname);
       console.log(`Number of players: ${snakePlayers.length()}`);
-      if(snakePlayers.length() >= 2){
- 
-          if(!started){
-          console.log("two players!");
-          started = true;
-          sleep(1000)
-          socket.emit("matchmade", true);
-          }
+      if(snakePlayers.length() >= 2 && !started){
+        started = true;
+        sleep(1000);
+        io.emit("matchmade", true); // Emit to all connected clients
       }
+      
     })
+  
 
     socket.on("eatpellet", (id) => {
         console.log(`processing pellet eaten: userid= ${id}`);
@@ -415,16 +432,21 @@ io.on("connection",
         const retName = ret.name;
         //console.log(retName);
         snakePlayers.resetBoard();
-        socket.emit("winner", retName);
+        io.emit("winner", retName);
         sleep(4000);
-        socket.emit("newgame", true);
+        io.emit("newgame", true);
       }
+    })
+
+    socket.on("disconnect", () => {
+      snakePlayers.remove(socket.id);
+      console.log(`player disconnected: ${socket.id}`);
     })
 
     socket.on("leave", (id) => {
       snakePlayers.remove(id);
       updateStatus();
-    });
+    })
 
     
     updateStatus();
